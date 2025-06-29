@@ -3,11 +3,15 @@ import 'package:flutter/services.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:fpdart/fpdart.dart' hide State;
 import '../utils/ln_address.dart';
+import '../utils/lnurl_utils.dart';
+import '../utils/fp_utils.dart';
 import '../bridge_generated.dart/lib.dart';
 import '../widgets/navigation_button.dart';
+import '../widgets/async_action_button.dart';
 import '../utils/notification_utils.dart';
-import 'detection_screen.dart';
 import 'ln_address_screen.dart';
+import 'pay_invoice_screen.dart';
+import 'ln_amount_screen.dart';
 
 // Send screen state types
 enum InputType { lightningAddress, lightningInvoice }
@@ -102,19 +106,125 @@ class _SendScreenState extends State<SendScreen> {
     detectInputType(input.toLowerCase().trim()).fold(
       () => _showError('Invalid Lightning address or invoice format'),
       (detectedData) {
-        _controller.stop();
+        _controller.pause();
+        _showDetectionDrawer(detectedData);
+      },
+    );
+  }
 
-        Navigator.of(context).pushReplacement(
+  void _showDetectionDrawer(Either<LightningAddress, String> detectedData) {
+    showModalBottomSheet<void>(
+      context: context,
+      isDismissible: true,
+      enableDrag: true,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder:
+          (context) => Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(20),
+              ),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircleAvatar(
+                      radius: 24,
+                      backgroundColor: Colors.deepPurple.withValues(alpha: 0.1),
+                      child: Icon(
+                        detectedData.fold(
+                          (_) => Icons.alternate_email,
+                          (_) => Icons.bolt,
+                        ),
+                        color: Colors.deepPurple,
+                        size: 28,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Text(
+                      detectedData.fold(
+                        (lightningAddress) => lightningAddress.fullAddress,
+                        (_) => 'Invoice Detected',
+                      ),
+                      style: const TextStyle(fontSize: 18),
+                    ),
+                    const Spacer(),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                AsyncActionButton(
+                  text: 'Continue',
+                  onPressed: () => _handleDetectionConfirm(detectedData),
+                ),
+              ],
+            ),
+          ),
+    ).then((_) => _resumeScanning());
+  }
+
+  TaskEither<String, void> _handleDetectionConfirm(
+    Either<LightningAddress, String> detectedData,
+  ) {
+    return detectedData.fold(
+      (lightningAddress) => _processLightningAddress(lightningAddress),
+      (invoice) => _processLightningInvoice(invoice),
+    );
+  }
+
+  TaskEither<String, void> _processLightningAddress(
+    LightningAddress lightningAddress,
+  ) {
+    return getLnurlPayInfo(lightningAddress).map((payInfo) {
+      if (mounted) {
+        Navigator.pop(context); // Close drawer
+        Navigator.pushReplacement(
+          context,
           MaterialPageRoute(
             builder:
-                (_) => DetectionScreen(
-                  detectedData: detectedData,
+                (_) => LightningAmountScreen(
+                  lightningAddress: lightningAddress,
+                  payInfo: payInfo,
                   punctureConnection: widget.punctureConnection,
                 ),
           ),
         );
-      },
-    );
+      }
+    });
+  }
+
+  TaskEither<String, void> _processLightningInvoice(String invoice) {
+    return safeTask(
+      () => widget.punctureConnection.bolt11Quote(invoice: invoice),
+    ).map((quoteResponse) {
+      if (mounted) {
+        Navigator.pop(context); // Close drawer
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder:
+                (_) => PayInvoiceScreen(
+                  quoteResponse: quoteResponse,
+                  displayDescription: true,
+                  rawInvoice: invoice,
+                  punctureConnection: widget.punctureConnection,
+                  lightningAddress: none<String>(),
+                ),
+          ),
+        );
+      }
+    });
+  }
+
+  void _resumeScanning() {
+    _controller.start();
   }
 
   void _showError(String message) {
@@ -133,23 +243,22 @@ class _SendScreenState extends State<SendScreen> {
     );
   }
 
-  Future<void> _handleClipboardPaste() async {
-    final result =
-        await TaskEither.tryCatch(
-              () => Clipboard.getData(Clipboard.kTextPlain),
-              (error, stackTrace) => 'Clipboard access error: $error',
-            )
-            .flatMap(
-              (clipboardData) => TaskEither.fromOption(
-                Option.fromNullable(
-                  clipboardData?.text,
-                ).filter((text) => text.isNotEmpty),
-                () => 'Clipboard is empty',
-              ),
-            )
-            .run();
+  TaskEither<String, String> _getClipboardText() {
+    return TaskEither.tryCatch(
+      () => Clipboard.getData(Clipboard.kTextPlain),
+      (error, stackTrace) => 'Clipboard access error: $error',
+    ).flatMap(
+      (clipboardData) => TaskEither.fromOption(
+        Option.fromNullable(
+          clipboardData?.text,
+        ).filter((text) => text.isNotEmpty),
+        () => 'Clipboard is empty',
+      ),
+    );
+  }
 
-    result.fold(_showError, _processInput);
+  Future<void> _handleClipboardPaste() async {
+    (await _getClipboardText().run()).fold(_showError, _processInput);
   }
 
   @override
