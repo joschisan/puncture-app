@@ -87,6 +87,7 @@ class SendScreen extends StatefulWidget {
 
 class _SendScreenState extends State<SendScreen> {
   final MobileScannerController _controller = MobileScannerController();
+  bool _isScanning = true;
 
   @override
   void dispose() {
@@ -95,6 +96,8 @@ class _SendScreenState extends State<SendScreen> {
   }
 
   void _onDetect(BarcodeCapture capture) {
+    if (!_isScanning) return;
+
     if (capture.barcodes.isEmpty) return;
 
     if (capture.barcodes.first.rawValue == null) return;
@@ -106,7 +109,10 @@ class _SendScreenState extends State<SendScreen> {
     detectInputType(input.toLowerCase().trim()).fold(
       () => _showError('Invalid Lightning address or invoice format'),
       (detectedData) {
-        _controller.pause();
+        setState(() {
+          _isScanning = false;
+        });
+
         _showDetectionDrawer(detectedData);
       },
     );
@@ -224,7 +230,9 @@ class _SendScreenState extends State<SendScreen> {
   }
 
   void _resumeScanning() {
-    _controller.start();
+    setState(() {
+      _isScanning = true;
+    });
   }
 
   void _showError(String message) {

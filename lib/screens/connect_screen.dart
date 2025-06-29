@@ -68,6 +68,7 @@ class ConnectScreen extends StatefulWidget {
 
 class _ConnectScreenState extends State<ConnectScreen> {
   final _controller = MobileScannerController();
+  bool _isScanning = true;
 
   @override
   void dispose() {
@@ -76,6 +77,8 @@ class _ConnectScreenState extends State<ConnectScreen> {
   }
 
   void _onDetect(BarcodeCapture capture) {
+     if (!_isScanning) return;
+
     if (capture.barcodes.isEmpty) return;
 
     if (capture.barcodes.first.rawValue == null) return;
@@ -84,7 +87,10 @@ class _ConnectScreenState extends State<ConnectScreen> {
   }
 
   void _processInput(String invite) {
-    _controller.pause();
+    setState(() {
+      _isScanning = false;
+    });
+
     _showInviteDrawer(invite);
   }
 
@@ -166,7 +172,9 @@ class _ConnectScreenState extends State<ConnectScreen> {
   }
 
   void _resumeScanning() {
-    _controller.start();
+    setState(() {
+      _isScanning = true;
+    });
   }
 
   void _showError(String message) {
