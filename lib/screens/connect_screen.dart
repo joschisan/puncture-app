@@ -5,8 +5,8 @@ import 'package:fpdart/fpdart.dart' hide State;
 import '../utils/fp_utils.dart';
 import '../utils/notification_utils.dart';
 import '../bridge_generated.dart/lib.dart';
+import '../widgets/async_action_button.dart';
 import 'home_screen.dart';
-import 'invite_detection_screen.dart';
 
 Widget _buildQrScanner(
   MobileScannerController controller,
@@ -27,6 +27,20 @@ Widget _buildQrScanner(
     },
   ),
 );
+
+TaskEither<String, String> _getClipboardText() {
+  return TaskEither.tryCatch(
+    () => Clipboard.getData(Clipboard.kTextPlain),
+    (error, stackTrace) => 'Clipboard access error: $error',
+  ).flatMap(
+    (clipboardData) => TaskEither.fromOption(
+      Option.fromNullable(
+        clipboardData?.text,
+      ).filter((text) => text.isNotEmpty),
+      () => 'Clipboard is empty',
+    ),
+  );
+}
 
 Widget _buildPasteButton(VoidCallback? onPaste) => ElevatedButton.icon(
   onPressed: onPaste,
@@ -53,7 +67,7 @@ class ConnectScreen extends StatefulWidget {
 }
 
 class _ConnectScreenState extends State<ConnectScreen> {
-  final MobileScannerController _controller = MobileScannerController();
+  final _controller = MobileScannerController();
 
   @override
   void dispose() {
@@ -70,18 +84,89 @@ class _ConnectScreenState extends State<ConnectScreen> {
   }
 
   void _processInput(String invite) {
-    _controller.stop();
+    _controller.pause();
+    _showInviteDrawer(invite);
+  }
 
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder:
-            (_) => InviteDetectionScreen(
-              invite: invite,
-              punctureClient: widget.punctureClient,
-              onInviteAdded: widget.onInviteAdded,
-            ),
+  void _showInviteDrawer(String invite) {
+    showModalBottomSheet<void>(
+      context: context,
+      isDismissible: true,
+      enableDrag: true,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-    );
+      builder:
+          (context) => Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(16),
+              ),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircleAvatar(
+                      radius: 24,
+                      backgroundColor: Colors.deepPurple.withValues(alpha: 0.1),
+                      child: const Icon(
+                        Icons.link,
+                        color: Colors.deepPurple,
+                        size: 32,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    const Text(
+                      'Invite Detected',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    const Spacer(),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                AsyncActionButton(
+                  text: 'Continue',
+                  onPressed: () => _handleInviteConfirm(invite),
+                ),
+              ],
+            ),
+          ),
+    ).then((_) => _resumeScanning());
+  }
+
+  TaskEither<String, void> _handleInviteConfirm(String invite) {
+    return safeTask(
+      () => widget.punctureClient.addInstance(invite: invite),
+    ).map((connection) {
+      // Notify BaseScreen to refresh its instances list
+      widget.onInviteAdded();
+
+      if (mounted) {
+        Navigator.pop(context); // Close drawer
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            settings: const RouteSettings(name: 'HomeScreen'),
+            builder:
+                (_) => HomeScreen(
+                  punctureConnection: connection,
+                  inviteString: invite,
+                ),
+          ),
+        );
+      }
+    });
+  }
+
+  void _resumeScanning() {
+    _controller.start();
   }
 
   void _showError(String message) {
@@ -89,22 +174,7 @@ class _ConnectScreenState extends State<ConnectScreen> {
   }
 
   Future<void> _handleClipboardPaste() async {
-    final result =
-        await TaskEither.tryCatch(
-              () => Clipboard.getData(Clipboard.kTextPlain),
-              (error, stackTrace) => 'Clipboard access error: $error',
-            )
-            .flatMap(
-              (clipboardData) => TaskEither.fromOption(
-                Option.fromNullable(
-                  clipboardData?.text,
-                ).filter((text) => text.isNotEmpty),
-                () => 'Clipboard is empty',
-              ),
-            )
-            .run();
-
-    result.fold(_showError, _processInput);
+    (await _getClipboardText().run()).fold(_showError, _processInput);
   }
 
   @override
