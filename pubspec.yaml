@@ -45,6 +45,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.1
   freezed: ^3.0.6
   json_annotation: ^4.9.0
   json_serializable: ^6.9.2
@@ -55,3 +56,11 @@ dev_dependencies:
 # The following section is specific to Flutter packages.
 flutter:
   uses-material-design: true
+
+# Flutter Launcher Icons configuration
+flutter_launcher_icons:
+  android: true
+  ios: false  # Set to true if you want to update iOS icons too
+  image_path: "icon.png"  # Path to your icon file
+  adaptive_icon_background: "#ffffff"  # Background color for adaptive icon
+  adaptive_icon_foreground: "icon.png"  # Foreground image for adaptive icon
