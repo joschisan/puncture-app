@@ -133,39 +133,41 @@ class _SendScreenState extends State<SendScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CircleAvatar(
-                  radius: 24,
-                  backgroundColor: Colors.deepPurple.withValues(alpha: 0.1),
-                  child: Icon(
-                    Icons.qr_code_scanner,
-                    color: Colors.deepPurple,
-                    size: 28,
+      builder: (context) => SafeArea(
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Theme.of(context).scaffoldBackgroundColor,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircleAvatar(
+                    radius: 24,
+                    backgroundColor: Colors.deepPurple.withValues(alpha: 0.1),
+                    child: Icon(
+                      Icons.qr_code_scanner,
+                      color: Colors.deepPurple,
+                      size: 28,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Text(
-                    displayText,
-                    style: const TextStyle(fontSize: 18),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Text(
+                      displayText,
+                      style: const TextStyle(fontSize: 18),
+                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            AsyncActionButton(text: 'Continue', onPressed: onPressed),
-          ],
+                ],
+              ),
+              const SizedBox(height: 16),
+              AsyncActionButton(text: 'Continue', onPressed: onPressed),
+            ],
+          ),
         ),
       ),
     ).then((shouldResume) {
