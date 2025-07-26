@@ -293,12 +293,7 @@ class _SendScreenState extends State<SendScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back),
-        onPressed: () => Navigator.of(context).pop(),
-      ),
-    ),
+    appBar: AppBar(),
     body: SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
