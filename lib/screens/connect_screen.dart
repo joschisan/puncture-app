@@ -106,15 +106,15 @@ class _ConnectScreenState extends State<ConnectScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder:
-          (context) => SafeArea(
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(16),
-                ),
+          (context) => Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(16),
               ),
+            ),
+            child: SafeArea(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
