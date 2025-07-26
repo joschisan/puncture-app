@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import '../widgets/async_action_button.dart';
+import '../widgets/amount_display.dart';
 import '../utils/fp_utils.dart';
 import '../bridge_generated.dart/lib.dart';
 import 'package:fpdart/fpdart.dart' hide State;
@@ -14,15 +14,6 @@ Widget _buildPaymentIcon() => Container(
     borderRadius: BorderRadius.circular(30),
   ),
   child: const Icon(Icons.arrow_upward, size: 40, color: Colors.deepPurple),
-);
-
-Widget _buildAmountDisplay(String amountText) => Text(
-  amountText,
-  style: const TextStyle(
-    fontSize: 24,
-    fontWeight: FontWeight.bold,
-    color: Colors.white,
-  ),
 );
 
 Widget _buildDetailRow(String label, String value) => Row(
@@ -80,9 +71,6 @@ class ConfirmationScreen extends StatelessWidget {
   int get _amountSats =>
       (paymentRequest.amountMsat().toDouble() / 1000).round();
 
-  String get _formattedAmount =>
-      '${NumberFormat('#,###').format(_amountSats)} sats';
-
   TaskEither<String, void> _payInvoice(BuildContext context) {
     return safeTask(() => punctureConnection.send(request: paymentRequest)).map(
       (_) {
@@ -110,7 +98,7 @@ class ConfirmationScreen extends StatelessWidget {
                   children: [
                     _buildPaymentIcon(),
                     const SizedBox(height: 24),
-                    _buildAmountDisplay(_formattedAmount),
+                    AmountDisplay(_amountSats),
                     const SizedBox(height: 24),
                     _buildPaymentDetails(context, paymentRequest, fee),
                   ],

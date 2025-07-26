@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:fpdart/fpdart.dart' hide State;
-import 'package:intl/intl.dart';
-import '../utils/fp_utils.dart';
-import '../bridge_generated.dart/lib.dart';
 import '../widgets/async_action_button.dart';
 import '../widgets/amount_display.dart';
 
@@ -43,6 +40,7 @@ class _AmountScreenState extends State<AmountScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(),
       body: SafeArea(
         child: Column(
           children: [

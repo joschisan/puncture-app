@@ -235,14 +235,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_keyboard:
-    dependency: "direct main"
-    description:
-      name: flutter_keyboard
-      sha256: ab5b64b1bf094b602246639c0318b369d818e45f2b86ca176923fff702cee3bc
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.3"
   flutter_launcher_icons:
     dependency: "direct dev"
     description:
