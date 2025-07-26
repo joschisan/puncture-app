@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../utils/fp_utils.dart';
 import '../bridge_generated.dart/lib.dart';
 import '../widgets/async_action_button.dart';
+import '../widgets/amount_display.dart';
 
 class AmountScreen extends StatefulWidget {
   final TaskEither<String, void> Function(int amountSats) onAmountSubmitted;
@@ -39,44 +40,17 @@ class _AmountScreenState extends State<AmountScreen> {
     });
   }
 
-  String get _formattedAmount {
-    if (_currentAmount.isEmpty) return '0';
-    final amount = int.tryParse(_currentAmount) ?? 0;
-    return NumberFormat('#,###').format(amount);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('')),
       body: SafeArea(
         child: Column(
           children: [
             // Amount display - fills remaining space above continue button
             Expanded(
               child: Center(
-                child: RichText(
-                  textAlign: TextAlign.center,
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: _formattedAmount,
-                        style: const TextStyle(
-                          fontSize: 42,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const TextSpan(
-                        text: ' sats',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
+                child: AmountDisplay(
+                  _currentAmount.isEmpty ? 0 : int.parse(_currentAmount),
                 ),
               ),
             ),

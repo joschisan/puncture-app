@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fpdart/fpdart.dart' as fp;
 import 'package:fpdart/fpdart.dart' hide State;
-import 'package:intl/intl.dart';
 
 import '../models/payment.dart';
 import '../screens/send_screen.dart';
@@ -10,6 +9,7 @@ import '../utils/notification_utils.dart';
 import '../utils/fp_utils.dart';
 import '../widgets/async_action_button.dart';
 import '../widgets/navigation_button.dart';
+import '../widgets/amount_display.dart';
 import '../bridge_generated.dart/lib.dart';
 
 IconData getStatusIcon(Payment payment) => switch (payment) {
@@ -40,28 +40,7 @@ Widget buildBalance(fp.Option<int> balanceSats) => balanceSats.fold(
       ),
     ),
   ),
-  (balance) => RichText(
-    text: TextSpan(
-      children: [
-        TextSpan(
-          text: NumberFormat('#,###').format(balance),
-          style: const TextStyle(
-            fontSize: 42,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-        const TextSpan(
-          text: ' sats',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-      ],
-    ),
-  ),
+  (balance) => AmountDisplay(balance),
 );
 
 TableRow buildTableRow(String label, String value) => TableRow(
