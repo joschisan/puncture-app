@@ -5,6 +5,7 @@ import '../bridge_generated.dart/lib.dart';
 import '../widgets/async_action_button.dart';
 import '../widgets/address_field.dart';
 import 'amount_screen.dart';
+import 'confirmation_screen.dart';
 
 class AddressScreen extends StatefulWidget {
   final PunctureConnectionWrapper punctureConnection;
@@ -72,11 +73,44 @@ class _AddressScreenState extends State<AddressScreen> {
         MaterialPageRoute(
           builder:
               (_) => AmountScreen(
-                paymentRequest: paymentRequest,
-                punctureConnection: widget.punctureConnection,
+                onAmountSubmitted:
+                    (amountSats) =>
+                        _handlePaymentAmount(paymentRequest, amountSats),
               ),
         ),
       );
+    });
+  }
+
+  TaskEither<String, void> _handlePaymentAmount(
+    PaymentRequestWithoutAmountWrapper paymentRequest,
+    int amountSats,
+  ) {
+    final amountMsat = BigInt.from(amountSats * 1000);
+
+    // Use the unified resolve function from Rust
+    return safeTask(
+      () => resolvePaymentRequest(request: paymentRequest, amount: amountMsat),
+    ).flatMap((paymentWithAmount) {
+      return safeTask(
+        () => widget.punctureConnection.quote(
+          amountMsat: paymentWithAmount.amountMsat(),
+        ),
+      ).map((fee) {
+        // Navigate to payment screen if mounted
+        if (!mounted) return;
+
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder:
+                (context) => ConfirmationScreen(
+                  paymentRequest: paymentWithAmount,
+                  fee: fee.toInt(),
+                  punctureConnection: widget.punctureConnection,
+                ),
+          ),
+        );
+      });
     });
   }
 

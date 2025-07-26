@@ -4,17 +4,11 @@ import 'package:intl/intl.dart';
 import '../utils/fp_utils.dart';
 import '../bridge_generated.dart/lib.dart';
 import '../widgets/async_action_button.dart';
-import 'confirmation_screen.dart';
 
 class AmountScreen extends StatefulWidget {
-  final PaymentRequestWithoutAmountWrapper paymentRequest;
-  final PunctureConnectionWrapper punctureConnection;
+  final TaskEither<String, void> Function(int amountSats) onAmountSubmitted;
 
-  const AmountScreen({
-    super.key,
-    required this.paymentRequest,
-    required this.punctureConnection,
-  });
+  const AmountScreen({super.key, required this.onAmountSubmitted});
 
   @override
   State<AmountScreen> createState() => _AmountScreenState();
@@ -92,7 +86,7 @@ class _AmountScreenState extends State<AmountScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: AsyncActionButton(
                 text: 'Continue',
-                onPressed: _sendPayment,
+                onPressed: _handleSubmit,
               ),
             ),
 
@@ -163,39 +157,13 @@ class _AmountScreenState extends State<AmountScreen> {
     );
   }
 
-  TaskEither<String, void> _sendPayment() {
+  TaskEither<String, void> _handleSubmit() {
     if (_currentAmount.isEmpty) {
       return TaskEither.left('Please enter an amount');
     }
 
-    final amountMsat = BigInt.from(int.parse(_currentAmount) * 1000);
+    final amountSats = int.parse(_currentAmount);
 
-    // Use the unified resolve function from Rust
-    return safeTask(
-      () => resolvePaymentRequest(
-        request: widget.paymentRequest,
-        amount: amountMsat,
-      ),
-    ).flatMap((paymentWithAmount) {
-      return safeTask(
-        () => widget.punctureConnection.quote(
-          amountMsat: paymentWithAmount.amountMsat(),
-        ),
-      ).map((fee) {
-        // Navigate to payment screen if mounted
-        if (!mounted) return;
-
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder:
-                (context) => ConfirmationScreen(
-                  paymentRequest: paymentWithAmount,
-                  fee: fee.toInt(),
-                  punctureConnection: widget.punctureConnection,
-                ),
-          ),
-        );
-      });
-    });
+    return widget.onAmountSubmitted(amountSats);
   }
 }
