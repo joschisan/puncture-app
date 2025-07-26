@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:fpdart/fpdart.dart' hide State;
 import '../widgets/qr_code_with_copy.dart';
 import '../widgets/navigation_button.dart';
 import '../bridge_generated.dart/lib.dart';
-import 'create_invoice_screen.dart';
+import '../utils/fp_utils.dart';
+import 'amount_screen.dart';
+import 'display_invoice_screen.dart';
 
 class ReceiveScreen extends StatelessWidget {
   final String offer;
@@ -18,9 +21,40 @@ class ReceiveScreen extends StatelessWidget {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder:
-            (_) => CreateInvoiceScreen(punctureConnection: punctureConnection),
+            (_) => AmountScreen(
+              onAmountSubmitted:
+                  (amountSats) => _handleInvoiceGeneration(context, amountSats),
+            ),
       ),
     );
+  }
+
+  TaskEither<String, void> _handleInvoiceGeneration(
+    BuildContext context,
+    int amountSats,
+  ) {
+    final amountMsat = amountSats * 1000;
+
+    return safeTask(
+      () => punctureConnection.bolt11Receive(
+        amountMsat: amountMsat,
+        description: '', // Empty description for now
+      ),
+    ).map((invoice) {
+      // Navigate to display screen if context is still mounted
+      if (!context.mounted) return;
+
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder:
+              (_) => DisplayInvoiceScreen(
+                invoice: invoice,
+                amount: amountSats,
+                description: '',
+              ),
+        ),
+      );
+    });
   }
 
   @override
