@@ -2,11 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:fpdart/fpdart.dart' hide State;
 import '../widgets/async_action_button.dart';
 import '../widgets/amount_display.dart';
+import '../bridge_generated.dart/lib.dart';
 
 class AmountScreen extends StatefulWidget {
-  final TaskEither<String, void> Function(int amountSats) onAmountSubmitted;
+  final TaskEither<String, void> Function(
+    int amountSats,
+    BuildContext context,
+    PunctureConnectionWrapper connection,
+  )
+  onAmountSubmitted;
+  final PunctureConnectionWrapper punctureConnection;
 
-  const AmountScreen({super.key, required this.onAmountSubmitted});
+  const AmountScreen({
+    super.key,
+    required this.onAmountSubmitted,
+    required this.punctureConnection,
+  });
 
   @override
   State<AmountScreen> createState() => _AmountScreenState();
@@ -136,6 +147,10 @@ class _AmountScreenState extends State<AmountScreen> {
 
     final amountSats = int.parse(_currentAmount);
 
-    return widget.onAmountSubmitted(amountSats);
+    return widget.onAmountSubmitted(
+      amountSats,
+      context,
+      widget.punctureConnection,
+    );
   }
 }

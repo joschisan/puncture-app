@@ -222,8 +222,13 @@ class _SendScreenState extends State<SendScreen> {
         builder:
             (context) => AmountScreen(
               onAmountSubmitted:
-                  (amountSats) =>
-                      _handlePaymentAmount(paymentRequest, amountSats),
+                  (amountSats, ctx, conn) => _handlePaymentAmount(
+                    paymentRequest,
+                    amountSats,
+                    ctx,
+                    conn,
+                  ),
+              punctureConnection: widget.punctureConnection,
             ),
       ),
     );
@@ -234,6 +239,8 @@ class _SendScreenState extends State<SendScreen> {
   TaskEither<String, void> _handlePaymentAmount(
     PaymentRequestWithoutAmountWrapper paymentRequest,
     int amountSats,
+    BuildContext navigationContext,
+    PunctureConnectionWrapper connection,
   ) {
     final amountMsat = BigInt.from(amountSats * 1000);
 
@@ -242,20 +249,18 @@ class _SendScreenState extends State<SendScreen> {
       () => resolvePaymentRequest(request: paymentRequest, amount: amountMsat),
     ).flatMap((paymentWithAmount) {
       return safeTask(
-        () => widget.punctureConnection.quote(
-          amountMsat: paymentWithAmount.amountMsat(),
-        ),
+        () => connection.quote(amountMsat: paymentWithAmount.amountMsat()),
       ).map((fee) {
-        // Navigate to payment screen if mounted
-        if (!mounted) return;
+        if (!navigationContext.mounted) return;
 
-        Navigator.of(context).push(
+        // Navigate to payment screen using the provided context
+        Navigator.of(navigationContext).push(
           MaterialPageRoute(
             builder:
                 (context) => ConfirmationScreen(
                   paymentRequest: paymentWithAmount,
                   fee: fee.toInt(),
-                  punctureConnection: widget.punctureConnection,
+                  punctureConnection: connection,
                 ),
           ),
         );

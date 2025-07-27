@@ -74,8 +74,13 @@ class _AddressScreenState extends State<AddressScreen> {
           builder:
               (_) => AmountScreen(
                 onAmountSubmitted:
-                    (amountSats) =>
-                        _handlePaymentAmount(paymentRequest, amountSats),
+                    (amountSats, ctx, conn) => _handlePaymentAmount(
+                      paymentRequest,
+                      amountSats,
+                      ctx,
+                      conn,
+                    ),
+                punctureConnection: widget.punctureConnection,
               ),
         ),
       );
@@ -85,6 +90,8 @@ class _AddressScreenState extends State<AddressScreen> {
   TaskEither<String, void> _handlePaymentAmount(
     PaymentRequestWithoutAmountWrapper paymentRequest,
     int amountSats,
+    BuildContext navigationContext,
+    PunctureConnectionWrapper connection,
   ) {
     final amountMsat = BigInt.from(amountSats * 1000);
 
@@ -93,20 +100,18 @@ class _AddressScreenState extends State<AddressScreen> {
       () => resolvePaymentRequest(request: paymentRequest, amount: amountMsat),
     ).flatMap((paymentWithAmount) {
       return safeTask(
-        () => widget.punctureConnection.quote(
-          amountMsat: paymentWithAmount.amountMsat(),
-        ),
+        () => connection.quote(amountMsat: paymentWithAmount.amountMsat()),
       ).map((fee) {
-        // Navigate to payment screen if mounted
-        if (!mounted) return;
+        if (!navigationContext.mounted) return;
 
-        Navigator.of(context).push(
+        // Navigate to payment screen using the provided context
+        Navigator.of(navigationContext).push(
           MaterialPageRoute(
             builder:
                 (context) => ConfirmationScreen(
                   paymentRequest: paymentWithAmount,
                   fee: fee.toInt(),
-                  punctureConnection: widget.punctureConnection,
+                  punctureConnection: connection,
                 ),
           ),
         );

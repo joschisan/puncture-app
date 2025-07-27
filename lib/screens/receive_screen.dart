@@ -22,29 +22,30 @@ class ReceiveScreen extends StatelessWidget {
       MaterialPageRoute(
         builder:
             (_) => AmountScreen(
-              onAmountSubmitted:
-                  (amountSats) => _handleInvoiceGeneration(context, amountSats),
+              onAmountSubmitted: _handleInvoiceGeneration,
+              punctureConnection: punctureConnection,
             ),
       ),
     );
   }
 
   TaskEither<String, void> _handleInvoiceGeneration(
-    BuildContext context,
     int amountSats,
+    BuildContext navigationContext,
+    PunctureConnectionWrapper connection,
   ) {
     final amountMsat = amountSats * 1000;
 
     return safeTask(
-      () => punctureConnection.bolt11Receive(
+      () => connection.bolt11Receive(
         amountMsat: amountMsat,
         description: '', // Empty description for now
       ),
     ).map((invoice) {
-      // Navigate to display screen if context is still mounted
-      if (!context.mounted) return;
+      if (!navigationContext.mounted) return;
 
-      Navigator.of(context).pushReplacement(
+      // Navigate to display screen using the provided context
+      Navigator.of(navigationContext).pushReplacement(
         MaterialPageRoute(
           builder:
               (_) => DisplayInvoiceScreen(
