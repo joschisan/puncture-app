@@ -89,14 +89,22 @@ class _ConnectScreenState extends State<ConnectScreen> {
   }
 
   void _processInput(String invite) {
-    setState(() {
-      _isScanning = false;
-    });
+    final decodedInvite = InviteWrapper.decode(invite: invite);
 
-    _showInviteDrawer(invite);
+    if (decodedInvite != null) {
+      setState(() {
+        _isScanning = false;
+      });
+
+      _showInviteDrawer(decodedInvite);
+
+      return;
+    } else {
+      _showError('Unknown format');
+    }
   }
 
-  void _showInviteDrawer(String invite) {
+  void _showInviteDrawer(InviteWrapper invite) {
     showModalBottomSheet<bool>(
       context: context,
       isDismissible: true,
@@ -157,7 +165,7 @@ class _ConnectScreenState extends State<ConnectScreen> {
     });
   }
 
-  TaskEither<String, void> _handleInviteConfirm(String invite) {
+  TaskEither<String, void> _handleInviteConfirm(InviteWrapper invite) {
     return safeTask(() => widget.punctureClient.register(invite: invite)).map((
       connection,
     ) {

@@ -11,6 +11,7 @@ unexpected_cfgs = { level = "warn", check-cfg = ['cfg(frb_expand)'] }
 
 [dependencies]
 flutter_rust_bridge = "=2.10.0"
+puncture-core = { git = "https://github.com/joschisan/puncture.git" }
 puncture-client = { git = "https://github.com/joschisan/puncture.git" }
 puncture-client-core = { git = "https://github.com/joschisan/puncture.git" }
 puncture-payment-request = { git = "https://github.com/joschisan/puncture.git" }

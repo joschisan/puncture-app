@@ -60,7 +60,7 @@ class NotificationUtils {
 
   static void showReceive(int amountSat) {
     HapticFeedback.mediumImpact();
-    
+
     _showNotification(
       'You received ${NumberFormat('#,###').format(amountSat)} sats!',
       Icons.bolt,

@@ -1,5 +1,6 @@
 use puncture_client::{Daemon, PunctureClient, PunctureConnection};
 use puncture_client_core::AppEvent;
+use puncture_core::invite::Invite;
 use puncture_payment_request::{PaymentRequestWithAmount, PaymentRequestWithoutAmount};
 
 #[flutter_rust_bridge::frb(opaque)]
@@ -7,6 +8,9 @@ pub struct PaymentRequestWithAmountWrapper(PaymentRequestWithAmount);
 
 #[flutter_rust_bridge::frb(opaque)]
 pub struct PaymentRequestWithoutAmountWrapper(PaymentRequestWithoutAmount);
+
+#[flutter_rust_bridge::frb(opaque)]
+pub struct InviteWrapper(Invite);
 
 #[flutter_rust_bridge::frb(opaque)]
 pub struct PunctureClientWrapper(PunctureClient);
@@ -17,6 +21,13 @@ pub struct DaemonWrapper(Daemon);
 #[flutter_rust_bridge::frb(opaque)]
 pub struct PunctureConnectionWrapper(PunctureConnection);
 
+impl InviteWrapper {
+    #[flutter_rust_bridge::frb(sync)]
+    pub fn decode(invite: &str) -> Option<InviteWrapper> {
+        Invite::decode(invite).map(InviteWrapper).ok()
+    }
+}
+
 impl PunctureClientWrapper {
     /// Create a new puncture client instance
     #[flutter_rust_bridge::frb]
@@ -26,9 +37,12 @@ impl PunctureClientWrapper {
 
     /// Add a new daemon from invite
     #[flutter_rust_bridge::frb]
-    pub async fn register(&self, invite: &str) -> Result<PunctureConnectionWrapper, String> {
+    pub async fn register(
+        &self,
+        invite: &InviteWrapper,
+    ) -> Result<PunctureConnectionWrapper, String> {
         Ok(PunctureConnectionWrapper(
-            self.0.register(invite.to_string()).await?,
+            self.0.register(invite.0.clone()).await?,
         ))
     }
 
