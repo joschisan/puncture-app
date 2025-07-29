@@ -155,7 +155,7 @@ class _SendScreenState extends State<SendScreen> {
                           alpha: 0.1,
                         ),
                         child: Icon(
-                          Icons.qr_code_scanner,
+                          Icons.arrow_upward,
                           color: Colors.deepPurple,
                           size: 28,
                         ),

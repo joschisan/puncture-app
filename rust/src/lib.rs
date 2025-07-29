@@ -42,6 +42,12 @@ impl PunctureClientWrapper {
             .map(DaemonWrapper)
             .collect()
     }
+
+    /// Delete a daemon from local db
+    #[flutter_rust_bridge::frb]
+    pub async fn delete_daemon(&self, daemon: DaemonWrapper) {
+        self.0.delete_daemon(daemon.0).await;
+    }
 }
 
 impl DaemonWrapper {
