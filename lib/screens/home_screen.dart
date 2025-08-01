@@ -5,6 +5,7 @@ import 'package:fpdart/fpdart.dart' hide State;
 import '../models/payment.dart';
 import '../screens/send_screen.dart';
 import '../screens/receive_screen.dart';
+import '../screens/recovery_screen.dart';
 import '../utils/notification_utils.dart';
 import '../utils/fp_utils.dart';
 import '../widgets/async_action_button.dart';
@@ -295,7 +296,23 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.more_vert),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder:
+                      (context) => RecoveryScreen(
+                        punctureConnection: widget.punctureConnection,
+                      ),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),

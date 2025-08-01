@@ -178,9 +178,9 @@ checksum = "c08606f8c3cbf4ce6ec8e28fb0014a2c086708fe954eaa885384a6165172e7e8"
 
 [[package]]
 name = "backon"
-version = "1.5.1"
+version = "1.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "302eaff5357a264a2c42f127ecb8bac761cf99749fc3dc95677e2743991f99e7"
+checksum = "592277618714fbcecda9a02ba7a8781f319d26532a88553bbacc77ba5d2b3a8d"
 dependencies = [
  "fastrand",
  "gloo-timers",
@@ -361,9 +361,9 @@ checksum = "d71b6127be86fdcfddb610f7182ac57211d4b18a3e9c82eb2d17662f2227ad6a"
 
 [[package]]
 name = "cc"
-version = "1.2.30"
+version = "1.2.31"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "deec109607ca693028562ed836a5f1c4b8bd77755c4e132fc5ce11b0b6211ae7"
+checksum = "c3a42d84bb6b69d3a8b3eaacf0d88f179e1929695e1ad012b6cf64d9caaa5fd2"
 dependencies = [
  "shlex",
 ]
@@ -2776,9 +2776,9 @@ checksum = "8b870d8c151b6f2fb93e84a13146138f05d02ed11c7e7c54f8826aaaf7c9f184"
 
 [[package]]
 name = "pkarr"
-version = "3.9.1"
+version = "3.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e80bbe1ea7bd30855c856cd796e67212eade4c275ab8554ce5458d7c75b4a63b"
+checksum = "5eb1f2f4311bae1da11f930c804c724c9914cf55ae51a9ee0440fc98826984f7"
 dependencies = [
  "async-compat",
  "base32",
@@ -3025,7 +3025,7 @@ dependencies = [
 [[package]]
 name = "puncture-client"
 version = "0.1.0"
-source = "git+https://github.com/joschisan/puncture.git#4c5128733cc6722a748c16b8a50a2d0b3a98bc0e"
+source = "git+https://github.com/joschisan/puncture.git#ff528ea599acbb85109399845ff91dee0fc91cce"
 dependencies = [
  "anyhow",
  "diesel",
@@ -3044,7 +3044,7 @@ dependencies = [
 [[package]]
 name = "puncture-client-core"
 version = "0.1.0"
-source = "git+https://github.com/joschisan/puncture.git#4c5128733cc6722a748c16b8a50a2d0b3a98bc0e"
+source = "git+https://github.com/joschisan/puncture.git#ff528ea599acbb85109399845ff91dee0fc91cce"
 dependencies = [
  "bitcoin",
  "lightning-invoice",
@@ -3054,7 +3054,7 @@ dependencies = [
 [[package]]
 name = "puncture-client-db"
 version = "0.1.0"
-source = "git+https://github.com/joschisan/puncture.git#4c5128733cc6722a748c16b8a50a2d0b3a98bc0e"
+source = "git+https://github.com/joschisan/puncture.git#ff528ea599acbb85109399845ff91dee0fc91cce"
 dependencies = [
  "diesel",
  "diesel_migrations",
@@ -3064,7 +3064,7 @@ dependencies = [
 [[package]]
 name = "puncture-core"
 version = "0.1.0"
-source = "git+https://github.com/joschisan/puncture.git#4c5128733cc6722a748c16b8a50a2d0b3a98bc0e"
+source = "git+https://github.com/joschisan/puncture.git#ff528ea599acbb85109399845ff91dee0fc91cce"
 dependencies = [
  "anyhow",
  "bitcoin",
@@ -3080,7 +3080,7 @@ dependencies = [
 [[package]]
 name = "puncture-payment-request"
 version = "0.1.0"
-source = "git+https://github.com/joschisan/puncture.git#4c5128733cc6722a748c16b8a50a2d0b3a98bc0e"
+source = "git+https://github.com/joschisan/puncture.git#ff528ea599acbb85109399845ff91dee0fc91cce"
 dependencies = [
  "lightning",
  "lightning-invoice",
@@ -3415,9 +3415,9 @@ dependencies = [
 
 [[package]]
 name = "rustls"
-version = "0.23.29"
+version = "0.23.31"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2491382039b29b9b11ff08b76ff6c97cf287671dbb74f0be44bda389fffe9bd1"
+checksum = "c0ebcbd2f03de0fc1122ad9bb24b127a5a6cd51d72604a3f3c50ac459762b6cc"
 dependencies = [
  "log",
  "once_cell",
@@ -3602,9 +3602,9 @@ dependencies = [
 
 [[package]]
 name = "serde_json"
-version = "1.0.141"
+version = "1.0.142"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "30b9eff21ebe718216c6ec64e1d9ac57087aad11efc64e32002bce4a0d4c03d3"
+checksum = "030fedb782600dcbd6f02d479bf0d817ac3bb40d644745b769d6a96bc3afc5a7"
 dependencies = [
  "itoa",
  "memchr",
@@ -4086,9 +4086,9 @@ checksum = "1f3ccbac311fea05f86f61904b462b55fb3df8837a366dfc601a0161d0532f20"
 
 [[package]]
 name = "tokio"
-version = "1.47.0"
+version = "1.47.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "43864ed400b6043a4757a25c7a64a8efde741aed79a056a2fb348a406701bb35"
+checksum = "89e49afdadebb872d3145a5638b59eb0691ea23e46ca484037cfab3b76b95038"
 dependencies = [
  "backtrace",
  "bytes",
@@ -4186,9 +4186,9 @@ dependencies = [
 
 [[package]]
 name = "toml"
-version = "0.9.3"
+version = "0.9.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e06723639aaded957e5a80be250c1f82f274b9d23ebb4d94163668470623461c"
+checksum = "41ae868b5a0f67631c14589f7e250c1ea2c574ee5ba21c6c8dd4b1485705a5a1"
 dependencies = [
  "indexmap",
  "serde",

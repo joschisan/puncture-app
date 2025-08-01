@@ -40,6 +40,15 @@ class NotificationUtils {
     );
   }
 
+  static void showSuccess(String message) {
+    _showNotification(
+      message,
+      Icons.check_circle,
+      Colors.green.shade200,
+      const Duration(seconds: 3),
+    );
+  }
+
   static void showError(String message) {
     _showNotification(
       message,
@@ -59,7 +68,7 @@ class NotificationUtils {
   }
 
   static void showReceive(int amountSat) {
-    HapticFeedback.mediumImpact();
+    HapticFeedback.heavyImpact();
 
     _showNotification(
       'You received ${NumberFormat('#,###').format(amountSat)} sats!',

@@ -154,7 +154,14 @@ class _BaseScreenState extends State<BaseScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.qr_code_scanner),
+            onPressed: _navigateToConnect,
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -187,8 +194,6 @@ class _BaseScreenState extends State<BaseScreen> {
                     },
                   ),
                 ),
-              const SizedBox(height: 16),
-              NavigationButton(text: 'Connect', onPressed: _navigateToConnect),
             ],
           ),
         ),

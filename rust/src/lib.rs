@@ -1,6 +1,6 @@
 use puncture_client::{Daemon, PunctureClient, PunctureConnection};
 use puncture_client_core::AppEvent;
-use puncture_core::invite::Invite;
+use puncture_core::{InviteCode, PunctureCode, RecoveryCode};
 use puncture_payment_request::{PaymentRequestWithAmount, PaymentRequestWithoutAmount};
 
 #[flutter_rust_bridge::frb(opaque)]
@@ -10,7 +10,10 @@ pub struct PaymentRequestWithAmountWrapper(PaymentRequestWithAmount);
 pub struct PaymentRequestWithoutAmountWrapper(PaymentRequestWithoutAmount);
 
 #[flutter_rust_bridge::frb(opaque)]
-pub struct InviteWrapper(Invite);
+pub struct RecoveryCodeWrapper(RecoveryCode);
+
+#[flutter_rust_bridge::frb(opaque)]
+pub struct InviteCodeWrapper(InviteCode);
 
 #[flutter_rust_bridge::frb(opaque)]
 pub struct PunctureClientWrapper(PunctureClient);
@@ -21,11 +24,20 @@ pub struct DaemonWrapper(Daemon);
 #[flutter_rust_bridge::frb(opaque)]
 pub struct PunctureConnectionWrapper(PunctureConnection);
 
-impl InviteWrapper {
-    #[flutter_rust_bridge::frb(sync)]
-    pub fn decode(invite: &str) -> Option<InviteWrapper> {
-        Invite::decode(invite).map(InviteWrapper).ok()
-    }
+#[flutter_rust_bridge::frb(sync)]
+pub fn decode_invite(invite: &str) -> Result<InviteCodeWrapper, String> {
+    PunctureCode::decode(invite)
+        .map_err(|_| "Unknown format".to_string())?
+        .to_invite()
+        .map(InviteCodeWrapper)
+}
+
+#[flutter_rust_bridge::frb(sync)]
+pub fn decode_recovery(recovery: &str) -> Result<RecoveryCodeWrapper, String> {
+    PunctureCode::decode(recovery)
+        .map_err(|_| "Unknown format".to_string())?
+        .to_recovery()
+        .map(RecoveryCodeWrapper)
 }
 
 impl PunctureClientWrapper {
@@ -39,7 +51,7 @@ impl PunctureClientWrapper {
     #[flutter_rust_bridge::frb]
     pub async fn register(
         &self,
-        invite: &InviteWrapper,
+        invite: &InviteCodeWrapper,
     ) -> Result<PunctureConnectionWrapper, String> {
         Ok(PunctureConnectionWrapper(
             self.0.register(invite.0.clone()).await?,
@@ -126,6 +138,18 @@ impl PunctureConnectionWrapper {
     #[flutter_rust_bridge::frb]
     pub async fn bolt12_receive_variable_amount(&self) -> Result<String, String> {
         self.0.bolt12_receive_variable_amount().await
+    }
+
+    /// Set a recovery name for the operator to identify the account
+    #[flutter_rust_bridge::frb]
+    pub async fn set_recovery_name(&self, name: &str) -> Result<(), String> {
+        self.0.set_recovery_name(Some(name.to_string())).await
+    }
+
+    /// Recover an accounts balance from a recovery code
+    #[flutter_rust_bridge::frb]
+    pub async fn recover(&self, recovery_code: &RecoveryCodeWrapper) -> Result<u64, String> {
+        self.0.recover(recovery_code.0.clone()).await
     }
 
     /// Get the next event from the daemon

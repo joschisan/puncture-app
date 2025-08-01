@@ -6,7 +6,6 @@ import '../utils/fp_utils.dart';
 import '../utils/notification_utils.dart';
 import '../bridge_generated.dart/lib.dart';
 import '../widgets/async_action_button.dart';
-import 'home_screen.dart';
 
 Widget _buildQrScanner(
   MobileScannerController controller,
@@ -52,21 +51,16 @@ Widget _buildPasteButton(VoidCallback? onPaste) => ElevatedButton.icon(
   ),
 );
 
-class ConnectScreen extends StatefulWidget {
-  final PunctureClientWrapper punctureClient;
-  final VoidCallback onDaemonAdded;
+class ScanRecoveryScreen extends StatefulWidget {
+  final PunctureConnectionWrapper punctureConnection;
 
-  const ConnectScreen({
-    super.key,
-    required this.punctureClient,
-    required this.onDaemonAdded,
-  });
+  const ScanRecoveryScreen({super.key, required this.punctureConnection});
 
   @override
-  State<ConnectScreen> createState() => _ConnectScreenState();
+  State<ScanRecoveryScreen> createState() => _ScanRecoveryScreenState();
 }
 
-class _ConnectScreenState extends State<ConnectScreen> {
+class _ScanRecoveryScreenState extends State<ScanRecoveryScreen> {
   final _controller = MobileScannerController();
   bool _isScanning = true;
 
@@ -88,15 +82,15 @@ class _ConnectScreenState extends State<ConnectScreen> {
     _processInput(capture.barcodes.first.rawValue!);
   }
 
-  void _processInput(String invite) {
+  void _processInput(String recovery) {
     try {
-      final inviteCode = decodeInvite(invite: invite);
+      final recoveryCode = decodeRecovery(recovery: recovery);
 
       setState(() {
         _isScanning = false;
       });
 
-      _showInviteDrawer(inviteCode);
+      _showRecoveryDrawer(recoveryCode);
 
       return;
     } catch (e) {
@@ -104,7 +98,7 @@ class _ConnectScreenState extends State<ConnectScreen> {
     }
   }
 
-  void _showInviteDrawer(InviteCodeWrapper invite) {
+  void _showRecoveryDrawer(RecoveryCodeWrapper recoveryCode) {
     showModalBottomSheet<bool>(
       context: context,
       isDismissible: true,
@@ -135,20 +129,23 @@ class _ConnectScreenState extends State<ConnectScreen> {
                           alpha: 0.1,
                         ),
                         child: const Icon(
-                          Icons.link,
+                          Icons.lock_open,
                           color: Colors.deepPurple,
                           size: 32,
                         ),
                       ),
                       const SizedBox(width: 16),
-                      const Text('Invite Code', style: TextStyle(fontSize: 18)),
+                      const Text(
+                        'Recovery Code',
+                        style: TextStyle(fontSize: 18),
+                      ),
                       const Spacer(),
                     ],
                   ),
                   const SizedBox(height: 16),
                   AsyncActionButton(
-                    text: 'Continue',
-                    onPressed: () => _handleInviteConfirm(invite),
+                    text: 'Recover',
+                    onPressed: () => _handleRecoveryConfirm(recoveryCode),
                   ),
                 ],
               ),
@@ -162,24 +159,19 @@ class _ConnectScreenState extends State<ConnectScreen> {
     });
   }
 
-  TaskEither<String, void> _handleInviteConfirm(InviteCodeWrapper invite) {
-    return safeTask(() => widget.punctureClient.register(invite: invite)).map((
-      connection,
-    ) {
-      // Notify BaseScreen to refresh its daemons list
-      widget.onDaemonAdded();
-
+  TaskEither<String, void> _handleRecoveryConfirm(
+    RecoveryCodeWrapper recoveryCode,
+  ) {
+    return safeTask(
+      () => widget.punctureConnection.recover(recoveryCode: recoveryCode),
+    ).map((recoveredAmount) {
       if (!mounted) return;
 
       Navigator.pop(context, false); // Close drawer, don't resume scanning
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          settings: const RouteSettings(name: 'HomeScreen'),
-          builder: (_) => HomeScreen(punctureConnection: connection),
-        ),
-      );
+      Navigator.pop(context); // Go back to recovery screen
+
+      Navigator.pop(context); // Go back to home screen
     });
   }
 

@@ -3,7 +3,6 @@ import 'package:fpdart/fpdart.dart' hide State;
 import '../utils/fp_utils.dart';
 import '../bridge_generated.dart/lib.dart';
 import '../widgets/async_action_button.dart';
-import '../widgets/address_field.dart';
 import 'amount_screen.dart';
 import 'confirmation_screen.dart';
 
@@ -153,8 +152,15 @@ class _AddressScreenState extends State<AddressScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                LightningAddressField(
+                TextFormField(
                   controller: _addressController,
+                  decoration: const InputDecoration(
+                    labelText: 'Lightning Address',
+                    hintText: 'username@domain.com',
+                    prefixIcon: Icon(Icons.alternate_email),
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.emailAddress,
                   autofocus: true,
                 ),
 
