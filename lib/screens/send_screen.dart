@@ -186,27 +186,22 @@ class _SendScreenState extends State<SendScreen> {
   TaskEither<String, void> _handleWithAmountConfirm(
     PaymentRequestWithAmountWrapper paymentRequest,
   ) {
-    return safeTask(
-      () => widget.punctureConnection.quote(
-        amountMsat: paymentRequest.amountMsat(),
+    if (!mounted) return TaskEither.right(());
+
+    Navigator.pop(context, false); // Close drawer, don't resume scanning
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder:
+            (context) => ConfirmationScreen(
+              paymentRequest: paymentRequest,
+              punctureConnection: widget.punctureConnection,
+            ),
       ),
-    ).map((fee) {
-      if (!mounted) return;
+    );
 
-      Navigator.pop(context, false); // Close drawer, don't resume scanning
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder:
-              (context) => ConfirmationScreen(
-                paymentRequest: paymentRequest,
-                fee: fee.toInt(),
-                punctureConnection: widget.punctureConnection,
-              ),
-        ),
-      );
-    });
+    return TaskEither.right(());
   }
 
   TaskEither<String, void> _handleWithoutAmountConfirm(
@@ -247,24 +242,19 @@ class _SendScreenState extends State<SendScreen> {
     // Use the unified resolve function from Rust
     return safeTask(
       () => resolvePaymentRequest(request: paymentRequest, amount: amountMsat),
-    ).flatMap((paymentWithAmount) {
-      return safeTask(
-        () => connection.quote(amountMsat: paymentWithAmount.amountMsat()),
-      ).map((fee) {
-        if (!navigationContext.mounted) return;
+    ).map((paymentWithAmount) {
+      if (!navigationContext.mounted) return;
 
-        // Navigate to payment screen using the provided context
-        Navigator.of(navigationContext).push(
-          MaterialPageRoute(
-            builder:
-                (context) => ConfirmationScreen(
-                  paymentRequest: paymentWithAmount,
-                  fee: fee.toInt(),
-                  punctureConnection: connection,
-                ),
-          ),
-        );
-      });
+      // Navigate to payment screen using the provided context
+      Navigator.of(navigationContext).push(
+        MaterialPageRoute(
+          builder:
+              (context) => ConfirmationScreen(
+                paymentRequest: paymentWithAmount,
+                punctureConnection: connection,
+              ),
+        ),
+      );
     });
   }
 

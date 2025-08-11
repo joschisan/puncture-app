@@ -33,38 +33,22 @@ Widget _buildDetailRow(String label, String value) => Row(
   ],
 );
 
-Widget _buildPaymentDetails(
-  BuildContext context,
-  PaymentRequestWithAmountWrapper paymentRequest,
-  int feeMsat,
-) {
-  final feeSats = (feeMsat / 1000).round();
-
+Widget _buildPaymentDetails(String description) {
   return Card(
     child: Padding(
       padding: const EdgeInsets.all(16),
-      child: Column(
-        children: [
-          _buildDetailRow('Fee:', '$feeSats sats'),
-          if (paymentRequest.description().isNotEmpty) ...[
-            const SizedBox(height: 16),
-            _buildDetailRow('Description:', paymentRequest.description()),
-          ],
-        ],
-      ),
+      child: Column(children: [_buildDetailRow('Description:', description)]),
     ),
   );
 }
 
 class ConfirmationScreen extends StatelessWidget {
   final PaymentRequestWithAmountWrapper paymentRequest;
-  final int fee;
   final PunctureConnectionWrapper punctureConnection;
 
   const ConfirmationScreen({
     super.key,
     required this.paymentRequest,
-    required this.fee,
     required this.punctureConnection,
   });
 
@@ -100,7 +84,8 @@ class ConfirmationScreen extends StatelessWidget {
                     const SizedBox(height: 24),
                     AmountDisplay(_amountSats),
                     const SizedBox(height: 24),
-                    _buildPaymentDetails(context, paymentRequest, fee),
+                    if (paymentRequest.description().isNotEmpty)
+                      _buildPaymentDetails(paymentRequest.description()),
                   ],
                 ),
               ),

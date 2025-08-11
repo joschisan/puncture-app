@@ -97,24 +97,19 @@ class _AddressScreenState extends State<AddressScreen> {
     // Use the unified resolve function from Rust
     return safeTask(
       () => resolvePaymentRequest(request: paymentRequest, amount: amountMsat),
-    ).flatMap((paymentWithAmount) {
-      return safeTask(
-        () => connection.quote(amountMsat: paymentWithAmount.amountMsat()),
-      ).map((fee) {
-        if (!navigationContext.mounted) return;
+    ).map((paymentWithAmount) {
+      if (!navigationContext.mounted) return;
 
-        // Navigate to payment screen using the provided context
-        Navigator.of(navigationContext).push(
-          MaterialPageRoute(
-            builder:
-                (context) => ConfirmationScreen(
-                  paymentRequest: paymentWithAmount,
-                  fee: fee.toInt(),
-                  punctureConnection: connection,
-                ),
-          ),
-        );
-      });
+      // Navigate to payment screen using the provided context
+      Navigator.of(navigationContext).push(
+        MaterialPageRoute(
+          builder:
+              (context) => ConfirmationScreen(
+                paymentRequest: paymentWithAmount,
+                punctureConnection: connection,
+              ),
+        ),
+      );
     });
   }
 
