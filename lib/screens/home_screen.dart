@@ -6,6 +6,7 @@ import '../models/payment.dart';
 import '../screens/send_screen.dart';
 import '../screens/receive_screen.dart';
 import '../screens/recovery_screen.dart';
+import '../screens/payment_details_screen.dart';
 import '../utils/notification_utils.dart';
 import '../utils/fp_utils.dart';
 import '../widgets/async_action_button.dart';
@@ -57,11 +58,12 @@ TableRow buildTableRow(String label, String value) => TableRow(
   ],
 );
 
-Widget buildPaymentTile(Payment payment) => Card(
+Widget buildPaymentTile(Payment payment, {VoidCallback? onTap}) => Card(
   margin: const EdgeInsets.symmetric(vertical: 4.0),
   child: ListTile(
     contentPadding: const EdgeInsets.all(8.0),
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    onTap: onTap,
     leading: CircleAvatar(
       backgroundColor: Colors.deepPurple.withValues(alpha: 0.1),
       child:
@@ -258,6 +260,8 @@ class _HomeScreenState extends State<HomeScreen> {
         id: paymentEvent.id,
         paymentType: paymentEvent.paymentType,
         amountMsat: paymentEvent.amountMsat.toInt(),
+        feeMsat: paymentEvent.feeMsat.toInt(),
+        description: paymentEvent.description,
         status: paymentEvent.status,
         lightningAddress: fp.Option.fromNullable(paymentEvent.lnAddress),
         createdAt: DateTime.fromMillisecondsSinceEpoch(
@@ -334,7 +338,19 @@ class _HomeScreenState extends State<HomeScreen> {
                           end: Offset.zero,
                         ).chain(CurveTween(curve: Curves.easeOut)),
                       ),
-                      child: buildPaymentTile(_payments[index]),
+                      child: buildPaymentTile(
+                        _payments[index],
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => PaymentDetailsScreen(
+                                    payment: _payments[index],
+                                  ),
+                            ),
+                          );
+                        },
+                      ),
                     );
                   },
                 ),
