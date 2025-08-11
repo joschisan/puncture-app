@@ -287,14 +287,9 @@ class _HomeScreenState extends State<HomeScreen> {
     if (existingIndex != -1) {
       setState(() {
         _payments[existingIndex].status = updateEvent.status;
+        _payments[existingIndex].feeMsat = updateEvent.feeMsat.toInt();
       });
     }
-  }
-
-  @override
-  void dispose() {
-    // The event listener will stop automatically when mounted becomes false
-    super.dispose();
   }
 
   @override

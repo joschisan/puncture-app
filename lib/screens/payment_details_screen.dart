@@ -39,7 +39,9 @@ Widget _buildPaymentDetails(Payment payment) {
   final details = <Widget>[];
 
   // Fee in satoshis
-  details.add(_buildDetailRow('Fee:', '${payment.feeSats} sats'));
+  if (payment.isOutgoing) {
+    details.add(_buildDetailRow('Fee:', '${payment.feeSats} sats'));
+  }
 
   // Description
   if (payment.displayDescription.isNotEmpty) {

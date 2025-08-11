@@ -4,7 +4,7 @@ class Payment {
   final String id;
   final String paymentType;
   final int amountMsat;
-  final int feeMsat;
+  int feeMsat;
   final String description;
   String status;
   final Option<String> lightningAddress;
@@ -24,6 +24,7 @@ class Payment {
   int get amountSats => (amountMsat / 1000).round();
   int get feeSats => (feeMsat / 1000).round();
   bool get isIncoming => paymentType == "receive";
+  bool get isOutgoing => paymentType == "send";
   bool get isPending => status == "pending";
   bool get isSuccess => status == "successful";
   bool get isFailed => status == "failed";

@@ -173,6 +173,7 @@ impl PunctureConnectionWrapper {
             AppEvent::Update(update) => Event::Update(UpdateEvent {
                 id: update.id,
                 status: update.status,
+                fee_msat: update.fee_msat,
             }),
         }
     }
@@ -207,6 +208,7 @@ pub struct BalanceEvent {
 pub struct UpdateEvent {
     pub id: String,
     pub status: String,
+    pub fee_msat: i64,
 }
 
 impl PaymentRequestWithAmountWrapper {
