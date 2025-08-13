@@ -3068,7 +3068,7 @@ dependencies = [
 [[package]]
 name = "puncture-client"
 version = "0.1.0"
-source = "git+https://github.com/joschisan/puncture.git#d4aab04a6aabbe39ed893dd609fe5a7d77206c9c"
+source = "git+https://github.com/joschisan/puncture.git#aec270f7f686ff24fa6e926e81664d142f6679fd"
 dependencies = [
  "anyhow",
  "diesel",
@@ -3087,7 +3087,7 @@ dependencies = [
 [[package]]
 name = "puncture-client-core"
 version = "0.1.0"
-source = "git+https://github.com/joschisan/puncture.git#d4aab04a6aabbe39ed893dd609fe5a7d77206c9c"
+source = "git+https://github.com/joschisan/puncture.git#aec270f7f686ff24fa6e926e81664d142f6679fd"
 dependencies = [
  "bitcoin",
  "lightning-invoice",
@@ -3097,7 +3097,7 @@ dependencies = [
 [[package]]
 name = "puncture-client-db"
 version = "0.1.0"
-source = "git+https://github.com/joschisan/puncture.git#d4aab04a6aabbe39ed893dd609fe5a7d77206c9c"
+source = "git+https://github.com/joschisan/puncture.git#aec270f7f686ff24fa6e926e81664d142f6679fd"
 dependencies = [
  "diesel",
  "diesel_migrations",
@@ -3107,7 +3107,7 @@ dependencies = [
 [[package]]
 name = "puncture-core"
 version = "0.1.0"
-source = "git+https://github.com/joschisan/puncture.git#d4aab04a6aabbe39ed893dd609fe5a7d77206c9c"
+source = "git+https://github.com/joschisan/puncture.git#aec270f7f686ff24fa6e926e81664d142f6679fd"
 dependencies = [
  "anyhow",
  "bitcoin",
@@ -3123,7 +3123,7 @@ dependencies = [
 [[package]]
 name = "puncture-payment-request"
 version = "0.1.0"
-source = "git+https://github.com/joschisan/puncture.git#d4aab04a6aabbe39ed893dd609fe5a7d77206c9c"
+source = "git+https://github.com/joschisan/puncture.git#aec270f7f686ff24fa6e926e81664d142f6679fd"
 dependencies = [
  "lightning",
  "lightning-invoice",
@@ -3356,9 +3356,9 @@ checksum = "2b15c43186be67a4fd63bee50d0303afffcef381492ebe2c5d87f324e1b8815c"
 
 [[package]]
 name = "reqwest"
-version = "0.12.22"
+version = "0.12.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cbc931937e6ca3a06e3b6c0aa7841849b160a90351d6ab467a8b9b9959767531"
+checksum = "d429f34c8092b2d42c7c93cec323bb4adeb7c67698f70839adec842ec10c7ceb"
 dependencies = [
  "base64",
  "bytes",

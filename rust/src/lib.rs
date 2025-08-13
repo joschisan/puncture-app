@@ -92,14 +92,7 @@ impl DaemonWrapper {
 }
 
 impl PunctureConnectionWrapper {
-    #[flutter_rust_bridge::frb]
-    pub async fn quote(&self, amount_msat: u64) -> Result<u64, String> {
-        self.0
-            .fees()
-            .await
-            .map(|fees| (amount_msat * fees.fee_ppm) / 1_000_000 + fees.base_fee_msat)
-    }
-
+    /// Send a payment to an abstracted payment request with amount
     #[flutter_rust_bridge::frb]
     pub async fn send(&self, request: &PaymentRequestWithAmountWrapper) -> Result<(), String> {
         match &request.0 {
@@ -136,8 +129,8 @@ impl PunctureConnectionWrapper {
     /// Create a static bolt12 offer for receiving payments
     /// with a variable amount and no expiration
     #[flutter_rust_bridge::frb]
-    pub async fn bolt12_receive_variable_amount(&self) -> Result<String, String> {
-        self.0.bolt12_receive_variable_amount().await
+    pub async fn bolt12_receive(&self) -> Result<String, String> {
+        self.0.bolt12_receive().await
     }
 
     /// Set a recovery name for the operator to identify the account

@@ -116,7 +116,7 @@ TaskEither<String, void> navigateToReceive(
   BuildContext context,
   PunctureConnectionWrapper punctureConnection,
 ) {
-  return safeTask(() => punctureConnection.bolt12ReceiveVariableAmount()).map((
+  return safeTask(() => punctureConnection.bolt12Receive()).map((
     offer,
   ) {
     Navigator.of(context).push(
