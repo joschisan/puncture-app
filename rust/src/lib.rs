@@ -110,6 +110,11 @@ impl PunctureConnectionWrapper {
                     .bolt12_send(bolt12.offer.clone(), bolt12.amount_msat)
                     .await
             }
+            PaymentRequestWithAmount::Onchain(onchain) => self
+                .0
+                .onchain_send(onchain.address.clone(), onchain.amount_sats)
+                .await
+                .map(|_| ()),
         }
     }
 
@@ -214,6 +219,9 @@ impl PaymentRequestWithAmountWrapper {
             PaymentRequestWithAmount::Bolt12(request) => {
                 format!("Offer for {} sats", request.amount_msat / 1000)
             }
+            PaymentRequestWithAmount::Onchain(request) => {
+                format!("Onchain address with {} sats", request.amount_sats)
+            }
         }
     }
 
@@ -236,6 +244,7 @@ impl PaymentRequestWithoutAmountWrapper {
             PaymentRequestWithoutAmount::Bolt12(..) => "Bolt12 Offer".to_string(),
             PaymentRequestWithoutAmount::LnUrl(..) => "LnUrl".to_string(),
             PaymentRequestWithoutAmount::LightningAddress(address) => address.to_string(),
+            PaymentRequestWithoutAmount::Onchain(..) => "Onchain address".to_string(),
         }
     }
 }
